@@ -9,6 +9,10 @@ import LogoSvg from "@assets/icons/logo.svg";
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 
+import { useForm, Controller } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+
 export function SignIn() {
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
 
