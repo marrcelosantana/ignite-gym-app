@@ -13,8 +13,33 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 
+type FormDataProps = {
+  email: string;
+  password: string;
+};
+
+const signInSchema = yup.object({
+  email: yup.string().required("Informe o email").email("Email inválido"),
+  password: yup
+    .string()
+    .required("Informe a senha")
+    .min(6, "A senha deve ter pelo menos 6 dígitos"),
+});
+
 export function SignIn() {
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
+    resolver: yupResolver(signInSchema),
+  });
+
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
+
+  function handleSignIn({ email, password }: FormDataProps) {
+    console.log({ email, password });
+  }
 
   function handleNewAccount() {
     navigation.navigate("signUp");
@@ -46,14 +71,32 @@ export function SignIn() {
             Acesse sua conta
           </Heading>
 
-          <Input
-            placeholder="E-mail"
-            keyboardType="email-address"
-            autoCapitalize="none"
+          <Controller
+            control={control}
+            name="email"
+            render={() => (
+              <Input
+                placeholder="E-mail"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                errorMessage={errors.email?.message}
+              />
+            )}
           />
-          <Input placeholder="Senha" secureTextEntry />
 
-          <Button title="Acessar" />
+          <Controller
+            control={control}
+            name="password"
+            render={() => (
+              <Input
+                placeholder="Senha"
+                secureTextEntry
+                errorMessage={errors.password?.message}
+              />
+            )}
+          />
+
+          <Button title="Acessar" onPress={handleSubmit(handleSignIn)} />
         </Center>
 
         <Center mt={24}>
