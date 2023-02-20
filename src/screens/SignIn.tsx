@@ -1,5 +1,14 @@
+import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { Center, Heading, Image, Text, VStack, ScrollView } from "native-base";
+import {
+  Center,
+  Heading,
+  Image,
+  Text,
+  VStack,
+  ScrollView,
+  useToast,
+} from "native-base";
 
 import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
 
@@ -10,35 +19,43 @@ import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 
 import { useForm, Controller } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
 
-type FormDataProps = {
+import { useAuth } from "@hooks/useAuth";
+import { AppError } from "@utils/AppError";
+
+type FormData = {
   email: string;
   password: string;
 };
-
-const signInSchema = yup.object({
-  email: yup.string().required("Informe o email").email("Email inválido"),
-  password: yup
-    .string()
-    .required("Informe a senha")
-    .min(6, "A senha deve ter pelo menos 6 dígitos"),
-});
 
 export function SignIn() {
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormDataProps>({
-    resolver: yupResolver(signInSchema),
-  });
+  } = useForm<FormData>({});
 
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
+  const toast = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const { signIn } = useAuth();
 
-  function handleSignIn({ email, password }: FormDataProps) {
-    console.log({ email, password });
+  async function handleSignIn({ email, password }: FormData) {
+    try {
+      setIsLoading(true);
+      await signIn(email, password);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError ? error.message : "Não foi possivel entrar.";
+
+      setIsLoading(false);
+
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+      });
+    }
   }
 
   function handleNewAccount() {
@@ -74,11 +91,13 @@ export function SignIn() {
           <Controller
             control={control}
             name="email"
-            render={() => (
+            rules={{ required: "Informe o email." }}
+            render={({ field: { onChange } }) => (
               <Input
                 placeholder="E-mail"
                 keyboardType="email-address"
                 autoCapitalize="none"
+                onChangeText={onChange}
                 errorMessage={errors.email?.message}
               />
             )}
@@ -87,16 +106,22 @@ export function SignIn() {
           <Controller
             control={control}
             name="password"
-            render={() => (
+            rules={{ required: "Informe a senha." }}
+            render={({ field: { onChange } }) => (
               <Input
                 placeholder="Senha"
                 secureTextEntry
+                onChangeText={onChange}
                 errorMessage={errors.password?.message}
               />
             )}
           />
 
-          <Button title="Acessar" onPress={handleSubmit(handleSignIn)} />
+          <Button
+            title="Acessar"
+            onPress={handleSubmit(handleSignIn)}
+            isLoading={isLoading}
+          />
         </Center>
 
         <Center mt={24}>
