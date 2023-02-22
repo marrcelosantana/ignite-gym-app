@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
-import { User } from "@models/User";
+import { UserDTO } from "@models/UserDTO";
 import { api } from "@services/api";
 import {
   storageUserGet,
@@ -13,7 +13,7 @@ import {
 } from "@storage/storageAuthToken";
 
 export type AuthContextDataProps = {
-  user: User;
+  user: UserDTO;
   isLoadingUserStorageData: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -28,16 +28,16 @@ export const AuthContext = createContext<AuthContextDataProps>(
 );
 
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
-  const [user, setUser] = useState<User>({} as User);
+  const [user, setUser] = useState<UserDTO>({} as UserDTO);
   const [isLoadingUserStorageData, setIsLoadingUserStorageData] =
     useState(true);
 
-  function userAndTokenUpdate(user: User, token: string) {
+  function userAndTokenUpdate(user: UserDTO, token: string) {
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     setUser(user);
   }
 
-  async function storageUserAndTokenSave(user: User, token: string) {
+  async function storageUserAndTokenSave(user: UserDTO, token: string) {
     try {
       setIsLoadingUserStorageData(true);
 
@@ -72,7 +72,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     try {
       setIsLoadingUserStorageData(true);
 
-      setUser({} as User);
+      setUser({} as UserDTO);
       await storageUserRemove();
       await storageAuthTokenRemove();
     } catch (error) {
