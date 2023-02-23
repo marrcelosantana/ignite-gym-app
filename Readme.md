@@ -35,3 +35,13 @@ $ yarn
 $ expo start
 
 ```
+
+### Telas da aplicação
+
+|              Login              |              Cadastro              |              Home              |
+| :-----------------------------: | :--------------------------------: | :----------------------------: |
+| <img src= "./assets/Login.png"> | <img src= "./assets/Register.png"> | <img src= "./assets/Home.png"> |
+
+|             Detalhes              |             Histórico             |              Perfil               |
+| :-------------------------------: | :-------------------------------: | :-------------------------------: |
+| <img src= "./assets/Details.png"> | <img src= "./assets/History.png"> | <img src= "./assets/Profile.png"> |
